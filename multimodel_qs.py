@@ -2,7 +2,7 @@
 Purpose: This demo shows using relational and native access side-by-side in a Python application,
 connecting to InterSystems IRIS.
 
-To Test: Run to see how to populate and retrieve data using PyODBC. Then uncomment the lines to execute storeAirfare and
+To test: Run to see how to populate and retrieve data using PyODBC. Then uncomment the lines to execute storeAirfare and
 checkAirfare to see how to create a custom data structure using the Native API.
 """
 
@@ -78,7 +78,6 @@ def populate_airports(connection):
     except:
         delete_old_table(cursor, "Demo.Location")
         cursor.execute(create_locations)
-        print("e")
 
     # Create Demo.Airport table in the InterSystems IRIS database
     create_airports = """
@@ -147,7 +146,7 @@ def store_airfare(iris_native, stored_global):
     iris_native.set("700", stored_global, "BOS", "BIS", "AA330")
     iris_native.set("710", stored_global, "BOS", "BIS", "UA208")
 
-    print("Stored fare and distance data in {} global.".format(stored_global))
+    print("\nStored fare and distance data in {} global.".format(stored_global))
 
 
 # Simple interactive method using IRIS native API to consult the data structure populated in storeAirfare()
