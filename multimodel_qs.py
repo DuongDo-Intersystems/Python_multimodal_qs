@@ -150,11 +150,11 @@ def store_airfare(iris_native, stored_global):
     print("Stored fare and distance data in {} global.".format(stored_global))
 
 
-# Simple interactive method using IRIS native API to consult the data structure populated in storeAirfare(
+# Simple interactive method using IRIS native API to consult the data structure populated in storeAirfare()
 def check_airfare(iris_native, stored_global):
     # Prompt for input
-    from_airport = input("Enter departure airport: ")
-    to_airport = input("Enter destination airport: ")
+    from_airport = input("Enter departure airport: (e.g. BOS)")
+    to_airport = input("Enter destination airport: (e.g. AUS)")
 
     # ^airport(from, to) = distance
     print("\nPrinted to {} global. The distance in miles between {} and {} is {}."
