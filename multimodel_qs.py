@@ -1,13 +1,6 @@
 import pyodbc
 import irisnative
 
-# AIRPORTS = [
-#     ("Boston Logan International", "BOS", "Boston, MA"),
-#     ("Philadelphia International", "PHL", "Philadelphia, PA"),
-#     ("Austin-Bergstrom International", "AUS", "Austin, TX"),
-#     ("San Francisco International", "SFO", "San Francisco, CA"),
-#     ("Chicago O'hare International", "ORD", "Chicago, IL")
-# ]
 
 AIRPORTS = [
     ("Boston Logan International", "BOS", "02128"),
@@ -34,12 +27,20 @@ def connect_to_iris():
     username = "SuperUser"
     password = "SYS"
 
-    connection_string = 'DRIVER={};SERVER={};PORT={};DATABASE={};UID={};PWD={}'.format(driver, ip, port, namespace,
-                                                                                        username, password)
+    connection_string = 'DRIVER={};SERVER={};PORT={};DATABASE={};UID={};PWD={}'\
+        .format(driver, ip, port, namespace, username, password)
+
     pyodbc_connection = pyodbc.connect(connection_string)
     nativeapi_connection = irisnative.createConnection(ip, port, namespace, username, password)
+
     print("Connected to InterSystem IRIS")
+
     return pyodbc_connection, nativeapi_connection
+
+
+def delete_old_table(cursor, table_name):
+    drop_table = "DROP TABLE {}".format(table_name)
+    cursor.execute(drop_table)
 
 
 def populate_airports(connection):
@@ -54,7 +55,13 @@ def populate_airports(connection):
             latitude varchar(50)
         )
     """
-    cursor.execute(create_locations)
+    try:
+
+        cursor.execute(create_locations)
+    except:
+        delete_old_table(cursor, "Demo.Location")
+        cursor.execute(create_locations)
+        print("e")
 
     create_airports = """
         CREATE TABLE Demo.Airport (
@@ -63,30 +70,31 @@ def populate_airports(connection):
             location Demo.Location
           )
         """
-    cursor.execute(create_airports)
+    try:
+        cursor.execute(create_airports)
+    except:
+        delete_old_table(cursor, "Demo.Airport")
+        cursor.execute(create_airports)
 
     insert_locations = """
         Insert into Demo.Location
         (zip, city, state, longitude, latitude)
         VALUES (?, ?, ?, ?, ?)
     """
-    for zip, city, state, longitude, latitude in LOCATIONS:
-        cursor.execute(insert_locations, zip.encode('utf-8'), city.encode('utf-8'), state.encode('utf-8'), longitude.encode('utf-8'), latitude.encode('utf-8'))
 
-    # insert_airports = """
-    #     Insert into Demo.Airport
-    #     (name, code, location)
-    #     VALUES (?, ?, (SELECT Demo.Location.zip FROM Demo.Location where Demo.Location.zip = ?))
-    # """
+    for zip, city, state, longitude, latitude in LOCATIONS:
+        cursor.execute(insert_locations, zip.encode('utf-8'), city.encode('utf-8'), state.encode('utf-8'),
+                       longitude.encode('utf-8'), latitude.encode('utf-8'))
 
     insert_airports = """
-                        Insert into Demo.Airport
-                        Select ?, ?, Demo.Location.id
-                        FROM Demo.Location 
-                        where Demo.Location.zip = ?
-                    """
-    for name, code, location in AIRPORTS:
-        cursor.execute(insert_airports, name.encode('utf-8'), code.encode('utf-8'), location.encode('utf-8'))
+        Insert into Demo.Airport
+        Select ?, ?, Demo.Location.id
+        FROM Demo.Location 
+        where Demo.Location.zip = ?
+    """
+
+    for name, code, zip in AIRPORTS:
+        cursor.execute(insert_airports, name.encode('utf-8'), code.encode('utf-8'), zip.encode('utf-8'))
 
     connection.commit()
 
@@ -120,7 +128,6 @@ def store_airfare(iris_native):
     # Need to change
     print("Printed to ^AIRPORT global. The distance in miles between {} and {} is {}. {}"
           .format(from_airport, to_airport, iris_native.getString("^AIRPORT", from_airport, to_airport), has_routes))
-
 
 
 def run():
