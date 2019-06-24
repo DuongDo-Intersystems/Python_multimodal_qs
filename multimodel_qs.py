@@ -107,27 +107,38 @@ def get_airports(connection):
         print("{}\t{}\t{}, {} {}".format(row.name, row.code, row.city, row.state, row.zip))
 
 
-def store_airfare(iris_native):
-    iris_native.set("1698", "^AIRPORT", "BOS", "AUS")
-    iris_native.set("450", "^AIRPORT", "BOS", "AUS", "AA150")
-    iris_native.set("550", "^AIRPORT", "BOS", "AUS", "AA290")
-    iris_native.set("200", "^AIRPORT", "BOS", "PHL", "UA110")
-    iris_native.set("700", "^AIRPORT", "BOS", "BIS", "AA330")
-    iris_native.set("710", "^AIRPORT", "BOS", "BIS", "UA208")
+def store_airfare(iris_native, stored_global):
+    iris_native.set("1698", stored_global, "BOS", "AUS")
+    iris_native.set("450", stored_global, "BOS", "AUS", "AA150")
+    iris_native.set("550", stored_global, "BOS", "AUS", "AA290")
 
+    iris_native.set("280", stored_global, "BOS", "PHL")
+    iris_native.set("200", stored_global, "BOS", "PHL", "UA110")
+
+    iris_native.set("1490", stored_global, "BOS", "BIS")
+    iris_native.set("700", stored_global, "BOS", "BIS", "AA330")
+    iris_native.set("710", stored_global, "BOS", "BIS", "UA208")
+
+    print("Stored fare and distance data in {} global.".format(stored_global))
+
+
+def check_airfare(iris_native, stored_global):
     from_airport = input("Enter departure airport: ")
     to_airport = input("Enter destination airport: ")
 
-    # Query for routes based on input
-    has_routes = "This path has no routes"
-    is_defined = iris_native.isDefined("^AIRPORT", from_airport, to_airport)
+    # Need to change
+    print("\nPrinted to {} global. The distance in miles between {} and {} is {}."
+          .format(stored_global, from_airport, to_airport, iris_native.getString("^airport", from_airport, to_airport)))
+
+    is_defined = iris_native.isDefined(stored_global, from_airport, to_airport)
 
     if is_defined == 11 or is_defined == 1:
-        has_routes = "This path has routes."
-
-    # Need to change
-    print("Printed to ^AIRPORT global. The distance in miles between {} and {} is {}. {}"
-          .format(from_airport, to_airport, iris_native.getString("^AIRPORT", from_airport, to_airport), has_routes))
+        print("The following routes exist for this path:")
+        iterator = iris_native.iterator(stored_global, from_airport, to_airport)
+        for flight_number, fare in iterator:
+            print(" - {}: {} USD".format(flight_number, fare))
+    else:
+        print("No routes exist for this path.")
 
 
 def run():
@@ -135,7 +146,8 @@ def run():
     populate_airports(pyodbc_connection)
     get_airports(pyodbc_connection)
     iris_native = irisnative.createIris(nativeapi_connection)
-    store_airfare(iris_native)
+    store_airfare(iris_native, "^airport")
+    check_airfare(iris_native, "^airport")
 
 
 if __name__ == '__main__':
