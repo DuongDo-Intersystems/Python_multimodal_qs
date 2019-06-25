@@ -35,7 +35,7 @@ def connect_to_iris():
     # Login credentials
     driver = "{InterSystems ODBC}"
     ip = "localhost"
-    port = 51780
+    port = 51773
     namespace = "USER"
     username = "SuperUser"
     password = "SYS"
@@ -133,7 +133,8 @@ def get_airports(connection):
 
 
 # Create a custom data structure to store airport distance and airfare information in a graph-like structure.
-def store_airfare(iris_native, stored_global):
+def store_airfare(iris_native):
+    stored_global = "^airport"
     # Store distance, routes, and airfares between airports
     iris_native.set("1698", stored_global, "BOS", "AUS")
     iris_native.set("450", stored_global, "BOS", "AUS", "AA150")
@@ -150,7 +151,8 @@ def store_airfare(iris_native, stored_global):
 
 
 # Simple interactive method using IRIS native API to consult the data structure populated in storeAirfare()
-def check_airfare(iris_native, stored_global):
+def check_airfare(iris_native):
+    stored_global = "^airport"
     # Prompt for input
     from_airport = input("Enter departure airport: (e.g. BOS)")
     to_airport = input("Enter destination airport: (e.g. AUS)")
@@ -165,7 +167,7 @@ def check_airfare(iris_native, stored_global):
         print("The following routes exist for this path:")
         iterator = iris_native.iterator(stored_global, from_airport, to_airport)
         for flight_number, fare in iterator:
-            print(" - {}: {} USD".format(flight_number, fare))
+            print(" -{}: {} USD".format(flight_number, fare))
     else:
         print("No routes exist for this path.")
 
@@ -178,10 +180,10 @@ def run():
     populate_airports(pyodbc_connection)
     get_airports(pyodbc_connection)
 
-    # Store data natively using the Native API
-    iris_native = irisnative.createIris(nativeapi_connection)
-    store_airfare(iris_native, "^airport")
-    check_airfare(iris_native, "^airport")
+    # Uncomment the following lines to store and retrieve data natively using the Native API
+    # iris_native = irisnative.createIris(nativeapi_connection)
+    # store_airfare(iris_native)
+    # check_airfare(iris_native)
 
 
 if __name__ == '__main__':

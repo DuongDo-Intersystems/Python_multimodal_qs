@@ -21,7 +21,8 @@ InterSystems IRIS driver for the Native API and PyODBC.
 
 ## Output
 
-If all works correctly, you will see a list of airports output. Data is stored and retrieved using JDBC (relationally).  
+If all works correctly, you will see a list of airports output. 
+Data is stored and retrieved using PyODBC (relationally).  
 
 If you would like to see how to store data natively using Python:
 1. Find and uncomment the following lines:  
