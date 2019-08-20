@@ -12,11 +12,12 @@ to handle route information between airports.
 1. In the integrated terminal, run the following lines to install the 
 InterSystems IRIS driver for the Native API and PyODBC.
  
-    * `cd /home/project/quickstarts-multimodel-python`
-    * `pip install nativeAPI_wheel/irisnative-1.0.0-cp34-abi3-linux_x86_64.whl`  
-    * `odbcinst -i -d -f pyodbc_wheel/odbcinst.ini`
+    - `cd /home/project/quickstarts-multimodel-python`
+    - `pip install nativeAPI_wheel/irisnative-1.0.0-cp34-abi3-linux_x86_64.whl`  
+    - `odbcinst -i -d -f pyodbc_wheel/odbcinst.ini`
 
-2. Run multimodelQS.py  
+2. Run multimodelQS.py
+
     `python multimodelQS.py `  
 
 ## Output
@@ -25,18 +26,24 @@ If all works correctly, you will see a list of airports output.
 Data is stored and retrieved using PyODBC (relationally).  
 
 If you would like to see how to store data natively using Python:
-1. Find and uncomment the following lines:  
-`# iris_native = irisnative.createIris(nativeapi_connection)`  
-`# store_airfare(iris_native, "^airport")`  
-`# check_airfare(iris_native, "^airport")`   
+
+1. Find and uncomment the following lines:
+
+```
+# iris_native = irisnative.createIris(nativeapi_connection)
+# store_airfare(iris_native, "^airport")  
+# check_airfare(iris_native, "^airport")
+```
+
 2. Enter departure airport: **BOS**
+
 3. Enter destination airport: **AUS**
 
 The output should say:  
->Printed to ^airport global. The distance in miles between BOS and AUS is: 1698.  
->The following routes exist for this path:  
->  -AA150: 450 USD  
->  -AA290: 550 USD 
+> Printed to ^airport global. The distance in miles between BOS and AUS is: 1698.  
+  The following routes exist for this path:  
+  -AA150: 450 USD  
+  -AA290: 550 USD 
 
 Other routes may be null.
 
